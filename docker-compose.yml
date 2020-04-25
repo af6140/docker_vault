@@ -7,10 +7,13 @@ services:
         ports:
             - "8500:8500"
             - "8300:8300"
+            - "8600:8600/udp"
         volumes:
             - ./config:/config
             - ./_data/consul:/data
-        command: agent -server -data-dir=/data -bind 0.0.0.0 -client 0.0.0.0 -bootstrap-expect=1
+        command: agent -server -data-dir=/data -ui -bind 0.0.0.0 -client 0.0.0.0 -bootstrap-expect=1
+        environment: 
+            - CONSUL_DISABLE_PERM_MGMT=true
 
     vault:
         container_name: vault
@@ -36,8 +39,8 @@ services:
             - vault:vault
         environment:
             NODE_TLS_REJECT_UNAUTHORIZED: 0
-            VAULT_URL_DEFAULT: https://vault:8200
-
+            VAULT_URL_DEFAULT: http://vault:8200
+            VAULT_AUTH_DEFAULT: USERNAMEPASSWORD
     backup:
         container_name: backup
         build: backup/
